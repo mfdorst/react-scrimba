@@ -1,0 +1,8 @@
+.cards {
+    margin-left: 37px;
+    margin-top: 13px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    overflow-x: auto;
+}

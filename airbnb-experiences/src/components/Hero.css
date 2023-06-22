@@ -1,0 +1,21 @@
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px;
+}
+
+.hero > img {
+    max-width: 550px;
+}
+
+.hero > h1 {
+    font-style: normal;
+    font-size: 36px;
+    margin: 16px 0px;
+}
+
+.hero > p {
+    max-width: 70%;
+    margin: 0px;
+}
