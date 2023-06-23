@@ -1,7 +1,6 @@
 import React from "react"
 import Sidebar from "./components/Sidebar"
 import Editor from "./components/Editor"
-import { data } from "./data"
 import Split from "react-split"
 import { nanoid } from "nanoid"
 
@@ -50,6 +49,11 @@ export default function App() {
         }) || notes[0]
     }
 
+    function deleteNote(event, noteId) {
+        event.stopPropagation()
+        setNotes(notes => notes.filter(note => note.id !== noteId))
+    }
+
     return (
         <main>
             {
@@ -65,6 +69,7 @@ export default function App() {
                             currentNote={findCurrentNote()}
                             setCurrentNoteId={setCurrentNoteId}
                             newNote={createNewNote}
+                            deleteNote={deleteNote}
                         />
                         {
                             currentNoteId &&
