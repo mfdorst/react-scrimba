@@ -2,12 +2,15 @@ import React from "react"
 import Sidebar from "./components/Sidebar"
 import Editor from "./components/Editor"
 import Split from "react-split"
-import { onSnapshot, addDoc, doc, deleteDoc, setDoc } from "firebase/firestore"
+import { onSnapshot, addDoc, doc, deleteDoc, setDoc, updateDoc } from "firebase/firestore"
 import { notesCollection, db } from "./firebase"
 
 export default function App() {
+    const DEBOUNCE_DELAY_MS = 500
+
     const [notes, setNotes] = React.useState([])
     const [currentNoteId, setCurrentNoteId] = React.useState("")
+    const [workingNoteText, setWorkingNoteText] = React.useState("")
 
     const currentNote = notes.find(note => note.id === currentNoteId) || notes[0]
 
@@ -30,6 +33,21 @@ export default function App() {
         }
     }, [notes])
 
+    React.useEffect(() => {
+        if (currentNote) {
+            setWorkingNoteText(currentNote.body)
+        }
+    }, [currentNote])
+
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (workingNoteText !== currentNote.body) {
+                updateNote(workingNoteText)
+            }
+        }, DEBOUNCE_DELAY_MS)
+        return () => clearTimeout(timeoutId)
+    }, [workingNoteText])
+
     async function createNewNote() {
         const newNote = {
             body: "# Type your markdown note's title here",
@@ -40,10 +58,10 @@ export default function App() {
         setCurrentNoteId(newNoteRef.id)
     }
 
-    async function updateNote(text) {
+    async function updateNote(body) {
         const docRef = doc(db, "notes", currentNoteId)
         // Use { merge: true } to not clobber the rest of the document
-        await setDoc(docRef, { body: text, updatedAt: Date.now() }, { merge: true })
+        await setDoc(docRef, { body, updatedAt: Date.now() }, { merge: true })
     }
 
     async function deleteNote(noteId) {
@@ -63,14 +81,14 @@ export default function App() {
                     >
                         <Sidebar
                             notes={notes}
-                            currentNote={currentNote}
+                            currentNoteId={currentNoteId}
                             setCurrentNoteId={setCurrentNoteId}
                             newNote={createNewNote}
                             deleteNote={deleteNote}
                         />
                         <Editor
-                            currentNote={currentNote}
-                            updateNote={updateNote}
+                            currentNoteText={workingNoteText}
+                            updateNoteText={setWorkingNoteText}
                         />
                     </Split>
                     :

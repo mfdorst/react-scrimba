@@ -1,19 +1,23 @@
 import React from "react"
 
-export default function Sidebar(props) {
-    const noteElements = props.notes.map((note, index) => (
+export default function Sidebar({
+    notes,
+    currentNoteId,
+    setCurrentNoteId,
+    newNote,
+    deleteNote,
+}) {
+    const noteElements = notes.map(note => (
         <div key={note.id}>
             <div
-                
-                className={`title ${
-                    note.id === props.currentNote.id ? "selected-note" : ""
-                }`}
-                onClick={() => props.setCurrentNoteId(note.id)}
+
+                className={`title ${note.id === currentNoteId ? "selected-note" : ""}`}
+                onClick={() => setCurrentNoteId(note.id)}
             >
                 <h4 className="text-snippet">{note.body.split("\n")[0]}</h4>
-                <button 
+                <button
                     className="delete-btn"
-                    onClick={() => props.deleteNote(note.id)}
+                    onClick={() => deleteNote(note.id)}
                 >
                     <i className="gg-trash trash-icon"></i>
                 </button>
@@ -25,7 +29,7 @@ export default function Sidebar(props) {
         <section className="pane sidebar">
             <div className="sidebar--header">
                 <h3>Notes</h3>
-                <button className="new-note" onClick={props.newNote}>+</button>
+                <button className="new-note" onClick={newNote}>+</button>
             </div>
             {noteElements}
         </section>
