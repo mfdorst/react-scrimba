@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Die from './Die'
+import Confetti from 'react-confetti'
 
 export default function App() {
   const [dice, setDice] = useState(() =>
@@ -7,12 +8,17 @@ export default function App() {
       .fill()
       .map(() => ({ number: rollDie(), locked: false }))
   )
+  const [won, setWon] = useState(false)
 
   function rollDie() {
     return Math.floor(Math.random() * 6) + 1
   }
 
   function rollDice() {
+    if (won) {
+      setDice(Array(10).fill({ locked: false }))
+      setWon(false)
+    }
     setDice((dice) =>
       dice.map((die) => (die.locked ? die : { ...die, number: rollDie() }))
     )
@@ -31,6 +37,13 @@ export default function App() {
     )
   }
 
+  useEffect(() => {
+    if (dice.every((die) => die.number === dice[0].number)) {
+      setWon(true)
+      setDice((dice) => dice.map((die) => ({ ...die, locked: true })))
+    }
+  }, [dice])
+
   const dieElements = dice.map((die, i) => (
     <Die
       key={i}
@@ -42,6 +55,7 @@ export default function App() {
 
   return (
     <main className='main'>
+      {won && <Confetti />}
       <h1 className='title'>Tenzies</h1>
       <p className='description'>
         Roll until all dice are the same. <br />
@@ -49,7 +63,7 @@ export default function App() {
       </p>
       <div className='dice-container'>{dieElements}</div>
       <div className='roll-button' onClick={rollDice}>
-        Roll
+        {won ? 'New Game' : 'Roll'}
       </div>
     </main>
   )
