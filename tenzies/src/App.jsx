@@ -1,35 +1,56 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Die from './Die'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [dice, setDice] = useState(() =>
+    Array(10)
+      .fill()
+      .map(() => ({ number: rollDie(), locked: false }))
+  )
+
+  function rollDie() {
+    return Math.floor(Math.random() * 6) + 1
+  }
+
+  function rollDice() {
+    setDice((dice) =>
+      dice.map((die) => (die.locked ? die : { ...die, number: rollDie() }))
+    )
+  }
+
+  function toggleLocked(index) {
+    setDice((dice) =>
+      dice.map((die, i) => {
+        if (i === index) {
+          const locked = die.locked ? false : true
+          return { ...die, locked }
+        } else {
+          return die
+        }
+      })
+    )
+  }
+
+  const dieElements = dice.map((die, i) => (
+    <Die
+      key={i}
+      value={die.number}
+      locked={die.locked}
+      onClick={() => toggleLocked(i)}
+    />
+  ))
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <main className='main'>
+      <h1 className='title'>Tenzies</h1>
+      <p className='description'>
+        Roll until all dice are the same. <br />
+        Click each die to freeze it at its current value.
       </p>
-    </>
+      <div className='dice-container'>{dieElements}</div>
+      <div className='roll-button' onClick={rollDice}>
+        Roll
+      </div>
+    </main>
   )
 }
-
-export default App
